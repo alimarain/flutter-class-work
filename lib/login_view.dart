@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reel_view/reel_view/reel_view.dart';
 
@@ -15,23 +16,34 @@ class _LoginState extends State<Login> {
   final String validEmail = 'abc12@gmail.com';
   final String validPassword = '12345';
 
-  void handleLogin() {
+  void handleLogin()async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email == validEmail && password == validPassword) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ReelsView(
-                  videoUrl: '',
-                )),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed To Verify Your Identity')),
-      );
-    }
+    // if (email == validEmail && password == validPassword) {
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) => ReelsView(
+    //               videoUrl: '',
+    //             )),
+    //   );
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Failed To Verify Your Identity')),
+    //   );
+    // }
+    try {
+  final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+    email: emailController.text,password:passwordController.text,
+  );
+} on FirebaseAuthException catch (e) {
+  if (e.code == 'user-not-found') {
+    print('No user found for that email.');
+  } else if (e.code == 'wrong-password') {
+    print('Wrong password provided for that user.');
+  }
+}
   }
 
   @override
